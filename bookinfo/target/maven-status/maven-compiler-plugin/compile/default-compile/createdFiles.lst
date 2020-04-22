@@ -1,0 +1,9 @@
+BookRental\BookInfoController.class
+BookRental\BookRegistered.class
+BookRental\BookInfo.class
+BookRental\BookInfoRepository.class
+BookRental\config\kafka\KafkaProcessor.class
+BookRental\AbstractEvent.class
+BookRental\BookDeleted.class
+BookRental\Application.class
+BookRental\BookInfoService.class

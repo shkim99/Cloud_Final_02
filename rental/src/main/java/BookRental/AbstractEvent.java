@@ -29,7 +29,7 @@ public class AbstractEvent {
         try {
             json = objectMapper.writeValueAsString(this);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("JSON format exception", e);
+            throw new RuntimeException("a a JSON format exception", e);
         }
 
         return json;

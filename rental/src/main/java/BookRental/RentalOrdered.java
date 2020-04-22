@@ -13,6 +13,9 @@ public class RentalOrdered extends AbstractEvent {
         super();
     }
 
+    public RentalOrdered(String rentalId, Long customerId, String customerName, Long bookId, String address) {
+    }
+
     public Long getId() {
         return id;
     }

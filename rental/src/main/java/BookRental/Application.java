@@ -12,7 +12,5 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @EnableFeignClients
 public class Application {
     protected static ApplicationContext applicationContext;
-    public static void main(String[] args) {
-        applicationContext = SpringApplication.run(Application.class, args);
-    }
+    public static void main(String[] args) { applicationContext = SpringApplication.run(Application.class, args); }
 }

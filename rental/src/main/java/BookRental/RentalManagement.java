@@ -1,7 +1,16 @@
 package BookRental;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.BeanUtils;
+import org.springframework.cloud.stream.messaging.Processor;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.MessageHeaders;
+import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.util.MimeTypeUtils;
+
 import java.util.List;
 
 @Entity
@@ -11,79 +20,74 @@ public class RentalManagement {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
+    private String rentalId;
     private Long customerId;
     private String customerName;
     private Long bookId;
     private String address;
-    private String rentalId;
 
-    @PrePersist
-    public void onPrePersist(){
-        RentalOrdered rentalOrdered = new RentalOrdered();
-        BeanUtils.copyProperties(this, rentalOrdered);
-        rentalOrdered.publish();
+    @PostPersist
+    public void publishRentalOrdedEvent() {
 
-        //Following code causes dependency to external APIs
-        // it is NOT A GOOD PRACTICE. instead, Event-Policy mapping is recommended.
+        // Reserved 이벤트 발생
 
-        BookRental.external.RentalManagement rentalManagement = new BookRental.external.RentalManagement();
-        // mappings goes here
-        Application.applicationContext.getBean(BookRental.external.RentalManagementService.class)
-            .deliveryStart(rentalManagement);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = null;
 
+        try {
+            json = objectMapper.writeValueAsString(new RentalOrdered(this.rentalId, this.customerId, this.customerName, this.bookId, this.address ));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("JSON format exception", e);
+        }
 
-        RentalCanceled rentalCanceled = new RentalCanceled();
-        BeanUtils.copyProperties(this, rentalCanceled);
-        rentalCanceled.publish();
+        Processor processor = Application.applicationContext.getBean(Processor.class);
+        MessageChannel outputChannel = processor.output();
 
-
+        outputChannel.send(MessageBuilder
+                .withPayload(json)
+                .setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON)
+                .build());
     }
-
 
     public Long getId() {
         return id;
     }
-
     public void setId(Long id) {
         this.id = id;
     }
-    public Long getCustomerId() {
-        return customerId;
-    }
 
-    public void setCustomerId(Long customerId) {
-        this.customerId = customerId;
-    }
-    public String getCustomerName() {
-        return customerName;
-    }
-
-    public void setCustomerName(String customerName) {
-        this.customerName = customerName;
-    }
-    public Long getBookId() {
-        return bookId;
-    }
-
-    public void setBookId(Long bookId) {
-        this.bookId = bookId;
-    }
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
     public String getRentalId() {
         return rentalId;
     }
-
     public void setRentalId(String rentalId) {
         this.rentalId = rentalId;
     }
 
+    public Long getCustomerId() {
+        return customerId;
+    }
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
+    }
 
+    public String getCustomerName() {
+        return customerName;
+    }
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
 
+    public Long getBookId() {
+        return bookId;
+    }
+    public void setBookId(Long bookId) {
+        this.bookId = bookId;
+    }
 
+    public String getAddress() {
+        return address;
+    }
+    public void setAddress(String address) {
+        this.address = address;
+    }
 }
