@@ -20,14 +20,10 @@ public class BookInfo {
         BeanUtils.copyProperties(this, bookRegistered);
         bookRegistered.publish();
 
-
         BookDeleted bookDeleted = new BookDeleted();
         BeanUtils.copyProperties(this, bookDeleted);
         bookDeleted.publish();
-
-
     }
-
 
     public Long getId() {
         return id;
@@ -50,8 +46,4 @@ public class BookInfo {
     public void setBookName(String bookName) {
         this.bookName = bookName;
     }
-
-
-
-
 }
