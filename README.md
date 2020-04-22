@@ -1,7 +1,6 @@
-# 07808 김석환수석 과제 - 책배달 서비스 구축
+# 02 - 김석환수석(07808) 과제 - 책배달 서비스 구축
 
 ![image](https://user-images.githubusercontent.com/48976696/79927995-84614600-847c-11ea-9937-55cbcffff6cd.jpg)
-![book_delivery](https://user-images.githubusercontent.com/48976696/79927995-84614600-847c-11ea-9937-55cbcffff6cd.jpg)
 
 이 시스템은 MSA/DDD/Event Storming/EDA 를 포괄하는 분석/설계/구현/운영 전단계를 커버하도록 구성하였습니다.
 이 시스템은 클라우드 네이티브 애플리케이션 Final Project 수행 테스트를 통과하기 위한 답안을 포함합니다.
