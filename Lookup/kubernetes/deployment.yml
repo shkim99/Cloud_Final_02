@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: Lookup
+  labels:
+    app: Lookup
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: Lookup
+  template:
+    metadata:
+      labels:
+        app: Lookup
+    spec:
+      containers:
+        - name: Lookup
+          image: username/Lookup:latest
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: '/actuator/health'
+              port: 8080
+            initialDelaySeconds: 10
+            timeoutSeconds: 2
+            periodSeconds: 5
+            failureThreshold: 10
+          livenessProbe:
+            httpGet:
+              path: '/actuator/health'
+              port: 8080
+            initialDelaySeconds: 120
+            timeoutSeconds: 2
+            periodSeconds: 5
+            failureThreshold: 5
