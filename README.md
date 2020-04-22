@@ -48,8 +48,8 @@
 
 # 분석/설계
 
-* 이벤트스토밍 결과:  http://msaez.io/#/storming/0vtSW2vBLoZTFiAsgdwS6H7ODs33/every/2dac041f4e652d598a042694dfa26b20/-M5LTyP4cBS9IpsqYq0h
-
+* 이벤트스토밍 결과: 
+![MSA설계](https://user-images.githubusercontent.com/48976696/79943830-e9c92d00-84a4-11ea-99a6-153e96985c0c.PNG)
 - Core Domain : 예약 (Reservation) 및 진료 (Diagnosis) 도메인
 - Supporting Domain : Lookup(CQRS) 도메인
 - General Domain : 알림(notice) 시스템.
