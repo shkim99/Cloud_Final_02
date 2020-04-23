@@ -55,8 +55,8 @@
 *bookinfo 서비스는 core 서비스로 rental 서비스와 통합을 고려할수 있음
 
 ## 헥사고날 아키텍처 다이어그램 도출
-    
-![image](https://user-images.githubusercontent.com/38850007/79833622-aad4a200-83e6-11ea-80f1-6eb9a59503af.png)
+![헥사고널](https://user-images.githubusercontent.com/48976696/80046262-1896e000-8545-11ea-8191-72e52ee402a2.PNG)
+
 
 
 # 구현:
