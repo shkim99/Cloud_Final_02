@@ -557,96 +557,18 @@ stages:
               secretType: 'dockerRegistry'
               containerRegistryType: 'Azure Container Registry'
 ```
+##  Pipe Line 등록 후  Deploy 결과
+![PipeLine_bookinfo](https://user-images.githubusercontent.com/48976696/80052286-48e67a80-8555-11ea-8117-7f68f2a164ce.PNG)
 
-
-## 동기식 호출 / 서킷 브레이킹 / 장애격리
-
-* 서킷 브레이킹 프레임워크의 선택: Spring FeignClient + Hystrix 옵션을 사용하여 구현함
-
-시나리오는 예약 시스템(reservation)-->진료(diagnosis) 시의 연결을 RESTful Request/Response 로 연동하여 구현이 되어있고, 진료 요청이 과도할 경우 CB 를 통하여 장애격리.
-
-- Hystrix 를 설정:  요청처리 쓰레드에서 처리시간이 610 밀리가 넘어서기 시작하여 어느정도 유지되면 CB 회로가 닫히도록 (요청을 빠르게 실패처리, 차단) 설정
-```
-# application.yml
-
-server:
-  port: 8081
-spring:
-  profiles: default
-  cloud:
-    stream:
-      kafka:
-        binder:
-          brokers: localhost:9092
-      bindings:
-        output:
-          destination: animal
-          contentType: application/json
-feign:
-  hystrix:
-    enabled: true
-    
-    
-
-```
-
-- 피호출 서비스(진료:diagnosis) 의 임의 부하 처리 - 400 밀리에서 증감 220 밀리 정도 왔다갔다 하게
-```
-# (diagnosis) MedicalRecord.java (Entity)
-
-    @PrePersist
-    public void onPrePersist(){  //진료이력을 저장한 후 적당한 시간 끌기
-        ...
-        
-        try {
-            Thread.currentThread().sleep((long) (400 + Math.random() * 220));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-```
-
-* 부하테스터 siege 툴을 통한 서킷 브레이커 동작 확인:
-- 동시사용자 100명
-- 60초 동안 실시
-
-```
-$ siege -c100 -t60s -r10 --content-type "application/json" 'http://localhost:8081/reservations POST {"reservatorName": "Jackson", "phoneNumber": "01032713104", "reservationDate": "2020-05-01"}'
-
-Windows 안에서 작동하는 Ubuntu에서 siege 실행시 "[error] unable to set close control sock.c:141: Invalid argument" 이 발생하여 중간 과정은 알 수 없음.
-
-그러나 아래와 같은 결과를 확인.
-
-Lifting the server siege...
-Transactions:                   1067 hits
-Availability:                  78.92 %
-Elapsed time:                  59.46 secs
-Data transferred:               0.37 MB
-Response time:                  5.36 secs
-Transaction rate:              17.94 trans/sec
-Throughput:                     0.01 MB/sec
-Concurrency:                   96.13
-Successful transactions:        1067
-Failed transactions:             285
-Longest transaction:            7.01
-Shortest transaction:           0.02
-
-```
-- 운영시스템은 죽지 않고 지속적으로 CB 에 의하여 적절히 회로가 열림과 닫힘이 벌어지면서 자원을 보호하고 있음을 보여줌. 78.92% 가 성공.
 
 ## 오토스케일 아웃
-앞서 CB 는 시스템을 안정되게 운영할 수 있게 해줬지만 사용자의 요청을 100% 받아들여주지 못했기 때문에 이에 대한 보완책으로 자동화된 확장 기능을 적용하고자 한다. 
-
-
-- 진료서비스에 대한 replica 를 동적으로 늘려주도록 HPA 를 설정한다. 설정은 CPU 사용량이 15프로를 넘어서면 replica 를 10개까지 늘려준다:
+- BookInfo서비스에 대한 replica 를 동적으로 늘려주도록 HPA 를 설정 (CPU 사용량이 15프로를 넘어서면 replica 를 10개까지 늘려줌)
 ```
-kubectl autoscale deploy diagnosis --min=1 --max=10 --cpu-percent=15
+kubectl autoscale deploy bookinfo --min=1 --max=10 --cpu-percent=15
 ```
-
-
 
 ## 무정지 재배포
-- 모든 프로젝트의 readiness probe 및 liveness probe 설정 완료.
+- 모든 프로젝트의 readiness probe 및 liveness probe 설정.
 ```yaml
 readinessProbe:
   httpGet:
