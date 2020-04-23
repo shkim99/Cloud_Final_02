@@ -89,15 +89,12 @@ public interface BookInfoRepository extends PagingAndSortingRepository<BookInfo,
 ```
 
 ## 클러스터 적용 후 REST API 의 테스트
-- http://52.231.118.148:8080/medicalRecords/     		//diagnosis 조회
-- http://52.231.118.148:8080/reservations/       		//reservation 조회 
-- http://52.231.118.148:8080/reservations reservatorName="pdc" reservationDate="202002" phoneNumber="0103701" //reservation 요청 
-
+- http http://52.231.117.105:8080/bookinfoes     		//bookinfo 조회
 
 
 ## API 게이트웨이
 - Local 테스트 환경에서는 localhost:8080에서 Gateway API 가 작동.
-- Cloud 환경에서는 http://52.231.118.148:8080 에서 Gateway API가 작동.
+- Cloud 환경에서는 http http://52.231.117.105:8080/ 에서 Gateway API가 작동.
 - application.yml 파일에 프로파일 별로 Gateway 설정.
 ### Gateway 설정 
 
