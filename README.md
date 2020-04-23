@@ -78,189 +78,21 @@
 
 ## DDD 의 적용
 
-- 각 서비스내에 도출된 핵심 Aggregate Root 객체를 Entity 로 선언하였다: (예시는 예약 시스템의 Reservation.class). 이때 가능한 현업에서 사용하는 언어 (유비쿼터스 랭귀지)를 그대로 사용하려고 노력했다.
-
-``` java
-package com.example.reservation;
-
-import com.example.reservation.external.MedicalRecord;
-import com.example.reservation.external.MedicalRecordService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.cloud.stream.messaging.Processor;
-import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.MessageHeaders;
-import org.springframework.messaging.support.MessageBuilder;
-import org.springframework.util.MimeTypeUtils;
-
-import javax.persistence.*;
-
-@Entity
-@Table(name = "RESERVATION")
-public class Reservation {
-
-    @Id
-    @GeneratedValue
-    private Long id;
-
-    private String reservatorName;
-
-    private String reservationDate;
-
-    private String phoneNumber;
-
-    @PostPersist
-    public void publishReservationReservedEvent() {
-
-        MedicalRecord medicalRecord = new MedicalRecord();
-
-        medicalRecord.setReservationId(this.getId());
-        medicalRecord.setDoctor("Brad pitt");
-        medicalRecord.setMedicalOpinion("별 이상 없습니다.");
-        medicalRecord.setTreatment("그냥 집에서 푹 쉬면 나을 것입니다.");
-
-        ReservationApplication.applicationContext.getBean(MedicalRecordService.class).diagnosis(medicalRecord);
-
-
-        // Reserved 이벤트 발생
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        String json = null;
-
-        try {
-            json = objectMapper.writeValueAsString(new ReservationReserved(this));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("JSON format exception", e);
-        }
-
-        Processor processor = ReservationApplication.applicationContext.getBean(Processor.class);
-        MessageChannel outputChannel = processor.output();
-
-        outputChannel.send(MessageBuilder
-                .withPayload(json)
-                .setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON)
-                .build());
-
-
-    }
-
-    @PostUpdate
-    public void publishReservationChangedEvent() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        String json = null;
-
-        try {
-            json = objectMapper.writeValueAsString(new ReservationChanged(this));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("JSON format exception", e);
-        }
-
-        Processor processor = ReservationApplication.applicationContext.getBean(Processor.class);
-        MessageChannel outputChannel = processor.output();
-
-        outputChannel.send(MessageBuilder
-                .withPayload(json)
-                .setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON)
-                .build());
-    }
-
-    @PostRemove
-    public void publishReservationCanceledEvent() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        String json = null;
-
-        try {
-            json = objectMapper.writeValueAsString(new ReservationCanceled(this));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("JSON format exception", e);
-        }
-
-        Processor processor = ReservationApplication.applicationContext.getBean(Processor.class);
-        MessageChannel outputChannel = processor.output();
-
-        outputChannel.send(MessageBuilder
-                .withPayload(json)
-                .setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON)
-                .build());
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getReservatorName() {
-        return reservatorName;
-    }
-
-    public void setReservatorName(String reservatorName) {
-        this.reservatorName = reservatorName;
-    }
-
-    public String getReservationDate() {
-        return reservationDate;
-    }
-
-    public void setReservationDate(String reservationDate) {
-        this.reservationDate = reservationDate;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-}
-
-
-```
+- 각 서비스내에 도출된 핵심 Aggregate Root 객체를 Entity 로 선언하며 현업에서 사용하는 언어 (유비쿼터스 랭귀지)를 사용하였음.
 
 - Entity Pattern 과 Repository Pattern 을 적용하여 JPA 를 통하여 다양한 데이터소스 유형 (RDB or NoSQL) 에 대한 별도의 처리가 없도록 데이터 접근 어댑터를 자동 생성하기 위하여 Spring Data REST 의 RestRepository 를 적용하였다.
 RDB로는 H2를 사용하였다. 
 ``` java
-package com.example.reservation;
+package BookRental;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface ReservationRepository extends CrudRepository<Reservation, Long> {
-}
+public interface BookInfoRepository extends PagingAndSortingRepository<BookInfo, Long>{
 
-}
-```
-- 적용 후 REST API 의 테스트
-
-주의!!! reservation 서비스에는 FeignClient가 적용되어 있다. 여기에 diagnosis 시스템의 api 주소가 하드코딩되어 있어 로컬 테스트 환경과
-Cloud 테스트 환경에서는 그 값을 달리하여 테스트하여야 한다.
-
-package com.example.reservation.external.MedicalRecordService의 내용을 테스트 환경에 따라 변경해준다.;
-
-
-- Local 환경 테스트시 
-``` java
-@FeignClient(name = "diagnosis", url = "http://localhost:8083")
-public interface MedicalRecordService {
-
-    @RequestMapping(method = RequestMethod.POST, path = "/medicalRecords")
-    public void diagnosis(@RequestBody MedicalRecord medicalRecord);
 }
 ```
 
-- Cloud 환경 테스트시
-``` java
-@FeignClient(name = "diagnosis", url = "http://diagnosis:8080")
-public interface MedicalRecordService {
-
-    @RequestMapping(method = RequestMethod.POST, path = "/medicalRecords")
-    public void diagnosis(@RequestBody MedicalRecord medicalRecord);
-}
-```
-
-아래의 명령어는 httpie 프로그램을 사용하여 입력한다.
+httpie 프로그램을 사용하여 입력한다.
 ```
 # 예약 서비스의 예약
 http post localhost:8081/reservations reservatorName="Jackson" reservationDate="2020-04-30" phoneNumber="010-1234-5678"
@@ -560,6 +392,17 @@ server:
 -->
 
 # 운영
+
+## Azure 및 GitHub 정보
+Azure 서비스 생성
+![azure_서비스생성](https://user-images.githubusercontent.com/48976696/80047159-a247ad00-8547-11ea-8b8d-3c37a20dc9cd.PNG)
+
+GitHub Repository 생성
+![github_Repository생성](https://user-images.githubusercontent.com/48976696/80047216-cc00d400-8547-11ea-9c2c-79fc3c98b87c.PNG)
+
+Cloud 내 kafka 설치 및 토픽생성, 이벤트 확인
+![kafka_확인](https://user-images.githubusercontent.com/48976696/80047285-fbafdc00-8547-11ea-8db6-4c681fea3cda.PNG)
+
 
 ## CI/CD 설정
 
