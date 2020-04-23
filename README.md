@@ -553,10 +553,11 @@ spring:
 server:
   port: 8080
 ```
-
+<!--
 ## Oauth 인증 적용.
 - Oauth 인증 적용. 
 - But, 수업 중에 사용한 Oauth 프로젝트를 그대로 이용하여 Gateway에 붙이기만 함.
+-->
 
 # 운영
 
