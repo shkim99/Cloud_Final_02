@@ -394,13 +394,14 @@ server:
 # 운영
 
 ## Azure 및 GitHub 정보
-Azure 서비스 생성
+#### Azure 서비스 생성
 ![azure_서비스생성](https://user-images.githubusercontent.com/48976696/80047159-a247ad00-8547-11ea-8b8d-3c37a20dc9cd.PNG)
 
-GitHub Repository 생성
+
+#### GitHub Repository 생성
 ![github_Repository생성](https://user-images.githubusercontent.com/48976696/80047216-cc00d400-8547-11ea-9c2c-79fc3c98b87c.PNG)
 
-Cloud 내 kafka 설치 및 토픽생성, 이벤트 확인
+#### Cloud 내 kafka 설치 및 토픽생성, 이벤트 확인
 ![kafka_확인](https://user-images.githubusercontent.com/48976696/80047285-fbafdc00-8547-11ea-8db6-4c681fea3cda.PNG)
 
 
