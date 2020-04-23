@@ -13,18 +13,11 @@
   - [분석/설계](#분석설계)
   - [구현](#구현)
     - [DDD 의 적용](#ddd-의-적용)
-    <!--- [동기식 호출과 Fallback 처리](#동기식-호출과-Fallback-처리)
-    - [비동기식 호출과 Eventual Consistency](#비동기식-호출과-Eventual-Consistency)
-    - [API 게이트웨이](#API-게이트웨이)
-    - [Oauth](#oauth)
-    -->
   - [운영](#운영)
     - [CI/CD 설정](#cicd-설정)
-    <!--
-    - [동기식 호출 / 서킷 브레이킹 / 장애격리](#동기식-호출--서킷-브레이킹--장애격리)
-    -->
-    - [오토스케일 아웃](#오토스케일-아웃)
     - [무정지 재배포](#무정지-재배포)
+    - [서비스 확인](#서비스확인)
+        
 
 # 서비스 시나리오
 기능적 요구사항
@@ -146,3 +139,5 @@ livenessProbe:
   periodSeconds: 5
   failureThreshold: 5
 ```
+### 서비스확인
+![서비스확인](https://user-images.githubusercontent.com/48976696/80066931-dfc42e80-8577-11ea-83eb-72252da4c96a.PNG)
