@@ -1,10 +1,10 @@
 # 02 - 김석환수석(07808) 과제 - 책배달 서비스 구축
 
 ![image](https://user-images.githubusercontent.com/48976696/79927995-84614600-847c-11ea-9937-55cbcffff6cd.jpg)
-
+<pre>
 이 시스템은 MSA/DDD/Event Storming/EDA 를 포괄하여 분석/설계/구현/운영 전단계로 구성하였습니다.
-본 문서는 Cloud App 개발과정  최종 Test 문서입니다.
-
+본 문서는 Cloud App 개발과정  최종 Test를 위한 문서입니다.
+</pre>
 
 # Table of contents
 
